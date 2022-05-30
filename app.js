@@ -22,8 +22,15 @@ connectToDb( (err) =>{
 // routes 
 
 app.get('/books',(req, res)=>{
+    const page = req.query.p || 0
+    const booksPerPage = 2 
+
     let books = []
-    data = db.collection('books').find().forEach(book => books.push(book) )
+    data = db.collection('books').find()
+    .sort({author : 1})
+    .skip(page * booksPerPage)
+    .limit(booksPerPage)
+    .forEach(book => books.push(book) )
     .then ( () => {
             res.status(200).json(books)
     }).catch( ()=> {
@@ -47,7 +54,7 @@ app.get('/books/:id',(req, res)=>{
 })
 app.post('/books', (req,res)=>{
     const book = req.body
-    // res.json(book)
+    
     db.collection('books').insertOne(book)
     .then( result => {
         res.status(200).json(result)
